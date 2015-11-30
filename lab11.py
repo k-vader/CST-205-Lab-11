@@ -1,12 +1,18 @@
+
+# Temporary User class (TO BE REPLACED)
 class User(object):
   
   def __init__(self, currentRoom):
     self.currentRoom = currentRoom
 
-
+# Room class. Stores exit information, room name, room description, and room number
+# Methods exist for displaying all room information or just the exits
 class Room(object):
-    
+    # Description is for the room description that the player will see as they move about the world
     description = "This is the default description"
+	
+	# Room exits. 0 is for no exit. Other integers indicate a valid exit, with the integer indicating
+	# which room that exit leads to
     northExit = 0
     southExit = 0
     eastExit = 0
