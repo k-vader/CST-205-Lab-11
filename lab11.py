@@ -44,7 +44,8 @@ class Room(object):
         self.southExit = south
         self.eastExit = east
         self.westExit = west
-    
+    # Returns a string consisting of the room name followed by a line break, the room description followed by a line break
+	# and the exits
     def show_room(self):
       roomString = self.name + '\n' + self.description + '\n' + self.show_exits()
       return roomString
@@ -89,7 +90,8 @@ rooms.append(roomTwo)
 rooms.append(roomThree)
 rooms.append(roomFour)
 rooms.append(roomFive)
-  
+
+# Create a player object and set it to start in room 1  
 player = User(1)
 
 
@@ -113,9 +115,15 @@ def getInput():
 
 # For movement around map.
 def doMove(roomList, currentRoom, direction):
+  # first find the current room in the room list
   for room in roomList:
     if room.number == currentRoom:
-      if direction == "north" and room.northExit:
+      # now we check if the direction passed in has a valid exit in the current room
+	  # if there is, we send a message to the player that we moved, set the player's
+	  # current room to the new room, and perform a look to display the new room to
+	  # the player
+	  # if not, we output a message stating the player cannot go in that direction
+	  if direction == "north" and room.northExit:
         printNow("You move north.")
         player.currentRoom = room.northExit
         doLook(roomList, player.currentRoom)
