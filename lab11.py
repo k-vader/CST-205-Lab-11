@@ -73,7 +73,7 @@ class Room(object):
             if self.southExit:
                 exitString = exitString + "South "
             if self.eastExit:
-                exitString = exitString + "East  "
+                exitString = exitString + "East "
             if self.westExit:
                 exitString = exitString + "West "
                 
