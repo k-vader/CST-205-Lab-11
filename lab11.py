@@ -1,5 +1,12 @@
+# Ken Vader
+# Ngoan Nguyen
+# Chris Pina
+# Lab 11
+# 12/1/2015
 
-# Temporary User class (TO BE REPLACED)
+
+# User class
+# Holds location and custom action information
 class User(object):
   
   def __init__(self, currentRoom):
@@ -88,15 +95,15 @@ class Room(object):
         return ""
 
 # Set up rooms and player as global objects
-# Create our 5 rooms, name them, and give them each a unique number
+# Create our 5 rooms, name them, and give them each a description
 roomOneAction = CustomAction("There's a hammer, would you like to pick it up?", "Yes", "Hammer")
-roomOne = Room("First Room", roomOneAction, "This is room one")
-roomTwo = Room("Second Room", None, "This is room two")
-roomThree = Room("Third Room", None, "This is room three")
-roomFour = Room("Fourth Room", None, "This is room four")
+roomOne = Room("The Foyer", roomOneAction, "You are in the dark, gloomy foyer. The door has locked behind you.\n")
+roomTwo = Room("The Kitchen", None, "You have entered the kitchen. The counters are covered in red.")
+roomThree = Room("The Dining Room", None, "You are in the dining room. The table is set, but there is no one in sight.")
+roomFour = Room("The Library", None, "Bookshelves from floor to ceiling. The books have vanished. Nothing but dust remains.")
 
 roomFiveAction = CustomAction("There's a pie, would you like to eat it?", "Eat", "Pie")
-roomFive = Room("Fifth Room", roomFiveAction, "This is room five")
+roomFive = Room("The Guest Room", roomFiveAction, "You have entered the guest room. Suitcases everywhere, but where are the guests?")
   
 # Set the exits up for our rooms
 roomOne.set_exit_directions(5, 0, 2, 0)
@@ -125,8 +132,10 @@ def getInput():
   # Here we check to see if they entered a known command, if not we prompt again
   if command == "north" or command == "south" or command == "east" or command == "west":
     return doMove(rooms, player.currentRoom, command)
-  elif command == "help" or command == "exit": # TODO: Move these into their own elif blocks and return appropriate function call once they are written
+  elif command == "exit":
     return command
+  elif command == "help":
+    return welcome()
   elif command == "look":
     return doLook(rooms, player.currentRoom)
   elif player.currentRoom.customAction:
@@ -187,7 +196,15 @@ def doLook(roomList, currentRoom):
       printNow(room.show_room())
       break
 
+def welcome():
+	printNow("***Welcome to Mystery Mansion***")
+	printNow("When entering each room, you will be able to move north, south,")
+	printNow("east and west into a different room. Type the direction to move. Type")
+	printNow("LOOK to get room details. Type HELP to redisplay this message. Type EXIT")
+	printNow("to quit the game. ENTER if you dare!")
+	  
 def adventure():
+  welcome()
   # Let's show the player where they are
   doLook(rooms, player.currentRoom)
   
