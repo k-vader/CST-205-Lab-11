@@ -105,7 +105,7 @@ def getInput():
   # Here we check to see if they entered a known command, if not we prompt again
   if command == "north" or command == "south" or command == "east" or command == "west":
     return doMove(rooms, player.currentRoom, command)
-  elif command == "help" or command == "exit":
+  elif command == "help" or command == "exit": # TODO: Move these into their own elif blocks and return appropriate function call once they are written
     return command
   elif command == "look":
     return doLook(rooms, player.currentRoom)
