@@ -11,11 +11,14 @@ class User(object):
   
   def __init__(self, currentRoom):
     self.currentRoom = currentRoom
-    self.customAction = None
-
-  # Stores a custom action with a reference to the room
-  def set_customAction(self, customAction):
-    self.customAction = customAction
+    self.win = false
+    self.customActions = []
+                
+  def set_lose(self, lose):
+    self.lose = lose
+    
+  def set_win(self, win):
+    self.win = win
 
 # Custom Action Class, accepts an action string
 class CustomAction(object):
@@ -46,6 +49,10 @@ class Room(object):
         self.customAction = action
         self.description = description
     
+    # is this room a losing room? If the user enters this room, he/she will LOSE!
+    def set_losingRoom(self, losingRoom):
+      self.losingRoom = losingRoom
+    
     # set name to newName
     def set_name(self, newName):
       self.name = newName
@@ -66,7 +73,7 @@ class Room(object):
     # Returns a string consisting of the room name followed by a line break, the room description followed by a line break
     # and the exits
     def show_room(self):
-      roomString = "Room Name: " + self.name + '\n' +  "Description: " + self.description + '\n' + "Exits: " + self.show_exits() + '\n' + self.show_actions()
+      roomString = "Room Name: " + self.name + '\n' +  "Description: " + self.description + '\n' + "Exits: " + self.show_exits() + '\n' + self.show_action()
       return roomString
         
     # returns a string based on available exits in current room    
@@ -87,7 +94,7 @@ class Room(object):
             return exitString
 
     # returns the user's custom action if available
-    def show_actions(self):
+    def show_action(self):
       if self.customAction:
         returnString = "Optional: " + self.customAction.actionString + " Enter [" + self.customAction.triggerString + "] to trigger"
         return returnString
@@ -96,19 +103,29 @@ class Room(object):
 
 # Set up rooms and player as global objects
 # Create our 5 rooms, name them, and give them each a description
-roomOneAction = CustomAction("There's a hammer, would you like to pick it up?", "Yes", "Hammer")
-roomOne = Room("The Foyer", roomOneAction, "You are in the dark, gloomy foyer. The door has locked behind you.\n")
+roomOne = Room("The Foyer", None, "You are in the dark, gloomy foyer. The door has locked behind you.\n")
+roomOne.losingRoom = false
+
 roomTwo = Room("The Kitchen", None, "You have entered the kitchen. The counters are covered in red.")
-roomThree = Room("The Dining Room", None, "You are in the dining room. The table is set, but there is no one in sight.")
-roomFour = Room("The Library", None, "Bookshelves from floor to ceiling. The books have vanished. Nothing but dust remains.")
-roomFive = Room("The Guest Room", None, "You have entered the guest room. Suitcases everywhere, but where are the guests?")
-  
+roomTwo.losingRoom = false
+
+roomThreeAction = CustomAction("There's something here, would you like to pick it up?", "Yes", "Flashlight")
+roomThree = Room("The Dining Room", roomThreeAction, "You are in the dining room. The table is set, but there is no one in sight. Eat some food, make sure it is light.")
+roomThree.losingRoom = false
+
+roomFourAction = CustomAction("There's something here, would you like to pick it up?", "Yes", "Key")
+roomFour = Room("The Library", roomFourAction, "Bookshelves from floor to ceiling. The books have vanished. Nothing but dust remains. I heard knowledge is the KEY to success...")
+roomFour.losingRoom = false
+
+roomFive = Room("The Dungeon", None, "You have entered the dungeon. YOU LOSE!")  
+roomFive.losingRoom = true
+
 # Set the exits up for our rooms
 roomOne.set_exit_directions(5, 0, 2, 0)
 roomTwo.set_exit_directions(3, 0, 0, 1)
 roomThree.set_exit_directions(0, 2, 0, 4)
 roomFour.set_exit_directions(0, 0, 3, 5)
-roomFive.set_exit_directions(0, 1, 4, 0)
+roomFive.set_exit_directions(0, 0, 0, 0)
   
 # Create a rooms list and add all of our rooms to it
 rooms = []
@@ -120,7 +137,7 @@ rooms.append(roomFive)
 
 # Create a player object and set it to start in room 1  
 player = User(roomOne)
-
+player.lose = false
 
 # Input function with validation. 
 def getInput():
@@ -147,12 +164,20 @@ def getInput():
     return getInput()
 
 def triggerActionForPlayer(player):
-  if player.customAction:
-    printNow("Sorry, can't do that, you already have a " + player.customAction.slug)
-  else:
-    player.customAction = player.currentRoom.customAction
-    printNow("You did something in room '" + player.currentRoom.name + "' and for that, you have a '" + player.currentRoom.customAction.slug + "'. Now go where?")
 
+    # prevent duplicate items
+    containsItem = false
+    for customAction in player.customActions:
+      if customAction.slug == player.currentRoom.customAction.slug:
+        containsItem = true
+        break;
+      
+    if containsItem == false:
+      player.customActions.append(player.currentRoom.customAction)
+      printNow("You picked up a " + player.currentRoom.customAction.slug + " from the " + player.currentRoom.name)
+    else:
+      printNow("You already picked this item up...")
+    
 # For movement around map.
 def doMove(roomList, currentRoom, direction):
   # first find the current room in the room list
@@ -188,9 +213,22 @@ def doMove(roomList, currentRoom, direction):
 
 def getRoomForRoomNumber(roomNumber):
   return rooms[roomNumber-1]
-  
+
+# We need 2 actions stored to win
+def didWin(player):
+  return len(player.customActions) == 2
+      
 # For 'look' command. Displays name, description, and exits of current room
 def doLook(roomList, currentRoom):
+  
+  if currentRoom.losingRoom:
+    player.lose = true
+    return
+  
+  if didWin(player):
+    player.win = true
+    return
+    
   for room in roomList:
     if room == currentRoom:
       printNow(room.show_room())
@@ -209,4 +247,19 @@ def adventure():
   
   userInput = getInput()
   while userInput != "exit":
-    userInput = getInput()
+    if player.lose == true:
+      printNow("You entered THE DUNGEON, it has no exits. YOU LOSE")
+      clearVars()
+      return
+    elif player.win == true:
+      printNow("You used your flashlight and key to exit the Froyer, you win!")
+      clearVars()
+      return
+    else:
+      userInput = getInput()
+
+def clearVars():
+  player.lose = false
+  player.currentRoom = rooms[0]
+  player.customActions = []
+  player.win = false
