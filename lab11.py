@@ -101,9 +101,7 @@ roomOne = Room("The Foyer", roomOneAction, "You are in the dark, gloomy foyer. T
 roomTwo = Room("The Kitchen", None, "You have entered the kitchen. The counters are covered in red.")
 roomThree = Room("The Dining Room", None, "You are in the dining room. The table is set, but there is no one in sight.")
 roomFour = Room("The Library", None, "Bookshelves from floor to ceiling. The books have vanished. Nothing but dust remains.")
-
-roomFiveAction = CustomAction("There's a pie, would you like to eat it?", "Eat", "Pie")
-roomFive = Room("The Guest Room", roomFiveAction, "You have entered the guest room. Suitcases everywhere, but where are the guests?")
+roomFive = Room("The Guest Room", None, "You have entered the guest room. Suitcases everywhere, but where are the guests?")
   
 # Set the exits up for our rooms
 roomOne.set_exit_directions(5, 0, 2, 0)
@@ -132,6 +130,8 @@ def getInput():
   # Here we check to see if they entered a known command, if not we prompt again
   if command == "north" or command == "south" or command == "east" or command == "west":
     return doMove(rooms, player.currentRoom, command)
+  elif command == "enter":
+    return doLook(rooms, player.currentRoom)
   elif command == "exit":
     return command
   elif command == "help":
@@ -148,7 +148,7 @@ def getInput():
 
 def triggerActionForPlayer(player):
   if player.customAction:
-    printNow("Sorry, can't do that, you already have a '" + player.customAction.slug + "' from room '" + player.currentRoom.name + "'")
+    printNow("Sorry, can't do that, you already have a " + player.customAction.slug)
   else:
     player.customAction = player.currentRoom.customAction
     printNow("You did something in room '" + player.currentRoom.name + "' and for that, you have a '" + player.currentRoom.customAction.slug + "'. Now go where?")
@@ -197,16 +197,15 @@ def doLook(roomList, currentRoom):
       break
 
 def welcome():
-	printNow("***Welcome to Mystery Mansion***")
-	printNow("When entering each room, you will be able to move north, south,")
-	printNow("east and west into a different room. Type the direction to move. Type")
-	printNow("LOOK to get room details. Type HELP to redisplay this message. Type EXIT")
-	printNow("to quit the game. ENTER if you dare!")
+  printNow("***Welcome to Mystery Mansion***")
+  printNow("When entering each room, you will be able to move north, south,")
+  printNow("east and west into a different room. Type the direction to move. Type")
+  printNow("LOOK to get room details. Type HELP to redisplay this message. Type EXIT")
+  printNow("to quit the game. ENTER if you dare!")
 	  
 def adventure():
+  #Let's welcome the player to the game
   welcome()
-  # Let's show the player where they are
-  doLook(rooms, player.currentRoom)
   
   userInput = getInput()
   while userInput != "exit":
