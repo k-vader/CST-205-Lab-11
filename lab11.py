@@ -235,24 +235,40 @@ def doLook(roomList, currentRoom):
       break
 
 def welcome():
-  printNow("***Welcome to Mystery Mansion***")
-  printNow("When entering each room, you will be able to move north, south,")
-  printNow("east and west into a different room. Type the direction to move. Type")
-  printNow("LOOK to get room details. Type HELP to redisplay this message. Type EXIT")
-  printNow("to quit the game. ENTER if you dare!")
+  welcomeMsg = "***Welcome to Mystery Mansion***\nWhen entering each room, you will be able to move north, south, east and west into a different room. Type the direction to move. Type LOOK to get room details. Type HELP to redisplay this message. Type EXIT to quit the game. ENTER if you dare!"
+  showInformation(welcomeMsg)
+  #printNow("***Welcome to Mystery Mansion***")
+  #printNow("When entering each room, you will be able to move north, south,")
+  #printNow("east and west into a different room. Type the direction to move. Type")
+  #printNow("LOOK to get room details. Type HELP to redisplay this message. Type EXIT")
+  #printNow("to quit the game. ENTER if you dare!")
+
+userName = ""
+
+def getName():
+  name = requestString("Please enter your name")
+  
+  if len(name) == 0:
+    return getName(name)
+  else:
+    return name
 	  
 def adventure():
   #Let's welcome the player to the game
   welcome()
   
+  userName = getName()
+  
   userInput = getInput()
   while userInput != "exit":
     if player.lose == true:
-      printNow("You entered THE DUNGEON, it has no exits. YOU LOSE")
+      showInformation(userName + " you have entered THE DUNGEON, it has no exits. YOU LOSE!")
+      #printNow("You entered THE DUNGEON, it has no exits. YOU LOSE")
       clearVars()
       return
     elif player.win == true:
-      printNow("You used your flashlight and key to exit the Froyer, you win!")
+      showInformation(userName + " you used your flashlight and key to exit the Foyer, you win! All hail " + userName + "!")
+      #printNow("You used your flashlight and key to exit the Froyer, you win!")
       clearVars()
       return
     else:
